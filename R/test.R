@@ -26,3 +26,47 @@ pcaMatrix <- setClass("pcaMatrix", slots = c(xptr = "externalptr", dims = "integ
 
 #' @export
 setMethod("initialize", signature(.Object = "pcaMatrix"), initialize)
+
+#' #' @export
+#' get_genotype <- function(x, i, j) {
+#'   .Call("pcaMatrix__get_genotype", x@xptr, i, j)
+#' }
+
+#' @export
+extract_vector <- function(x, i) {
+  .Call("pcaMatrix__extract_vector", x@xptr, i)
+}
+
+#' @export
+extract_matrix <- function(x, i, j) {
+  subset <- .Call("pcaMatrix__extract_matrix", x@xptr, i, j)
+  return(subset)
+}
+
+#' @export
+prodvec <- function(x, vec, nIND, nSNP) {
+  out <- .Call("pcaMatrix__prodvect", x@xptr, vec, nIND, nSNP)
+  return(out)
+}
+
+#' @export
+crossprodvec <- function(x, vec, nIND, nSNP) {
+  out <- .Call("pcaMatrix__crossprodvect", x@xptr, vec, nIND, nSNP)
+  return(out)
+}
+
+#' @export
+# single core implementation
+ma_rsvd <- function(X, k, nIND, nSNP) {
+  it <- 0
+  A <- function(x, args) {
+    prodvec(X, x, nIND, nSNP)
+  }
+  Atrans <- function(x, args) {
+    crossprodvec(X, x, nIND, nSNP)
+  }
+  res <- RSpectra::svds(A, k, nu = k, nv = k, Atrans = Atrans, dim = c(nIND, nSNP))
+  
+  return(res)
+}
+

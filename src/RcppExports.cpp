@@ -16,11 +16,19 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP pcaMatrix__crossprodvect(SEXP, SEXP, SEXP, SEXP);
+RcppExport SEXP pcaMatrix__extract_matrix(SEXP, SEXP, SEXP);
+RcppExport SEXP pcaMatrix__extract_vector(SEXP, SEXP);
 RcppExport SEXP pcaMatrix__new(SEXP, SEXP, SEXP);
+RcppExport SEXP pcaMatrix__prodvect(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"anRpackage_rcpp_hello_world", (DL_FUNC) &anRpackage_rcpp_hello_world, 0},
+    {"pcaMatrix__crossprodvect",    (DL_FUNC) &pcaMatrix__crossprodvect,    4},
+    {"pcaMatrix__extract_matrix",   (DL_FUNC) &pcaMatrix__extract_matrix,   3},
+    {"pcaMatrix__extract_vector",   (DL_FUNC) &pcaMatrix__extract_vector,   2},
     {"pcaMatrix__new",              (DL_FUNC) &pcaMatrix__new,              3},
+    {"pcaMatrix__prodvect",         (DL_FUNC) &pcaMatrix__prodvect,         4},
     {NULL, NULL, 0}
 };
 
