@@ -5,17 +5,32 @@
 
 using namespace Rcpp;
 
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP anRpackage_rcpp_hello_world() {
+// sum_vec_1
+NumericVector sum_vec_1(NumericVector x, NumericVector y);
+RcppExport SEXP anRpackage_sum_vec_1(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello_world());
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(sum_vec_1(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sum_vec_3
+NumericVector sum_vec_3(NumericVector x, NumericVector y);
+RcppExport SEXP anRpackage_sum_vec_3(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(sum_vec_3(x, y));
     return rcpp_result_gen;
 END_RCPP
 }
 
+RcppExport SEXP pcaMatrix__center_scale(SEXP, SEXP, SEXP);
 RcppExport SEXP pcaMatrix__crossprodvect(SEXP, SEXP, SEXP, SEXP);
 RcppExport SEXP pcaMatrix__extract_matrix(SEXP, SEXP, SEXP);
 RcppExport SEXP pcaMatrix__extract_vector(SEXP, SEXP);
@@ -23,12 +38,14 @@ RcppExport SEXP pcaMatrix__new(SEXP, SEXP, SEXP);
 RcppExport SEXP pcaMatrix__prodvect(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"anRpackage_rcpp_hello_world", (DL_FUNC) &anRpackage_rcpp_hello_world, 0},
-    {"pcaMatrix__crossprodvect",    (DL_FUNC) &pcaMatrix__crossprodvect,    4},
-    {"pcaMatrix__extract_matrix",   (DL_FUNC) &pcaMatrix__extract_matrix,   3},
-    {"pcaMatrix__extract_vector",   (DL_FUNC) &pcaMatrix__extract_vector,   2},
-    {"pcaMatrix__new",              (DL_FUNC) &pcaMatrix__new,              3},
-    {"pcaMatrix__prodvect",         (DL_FUNC) &pcaMatrix__prodvect,         4},
+    {"anRpackage_sum_vec_1", (DL_FUNC) &anRpackage_sum_vec_1, 2},
+    {"anRpackage_sum_vec_3", (DL_FUNC) &anRpackage_sum_vec_3, 2},
+    {"pcaMatrix__center_scale",   (DL_FUNC) &pcaMatrix__center_scale,   3},
+    {"pcaMatrix__crossprodvect",  (DL_FUNC) &pcaMatrix__crossprodvect,  4},
+    {"pcaMatrix__extract_matrix", (DL_FUNC) &pcaMatrix__extract_matrix, 3},
+    {"pcaMatrix__extract_vector", (DL_FUNC) &pcaMatrix__extract_vector, 2},
+    {"pcaMatrix__new",            (DL_FUNC) &pcaMatrix__new,            3},
+    {"pcaMatrix__prodvect",       (DL_FUNC) &pcaMatrix__prodvect,       4},
     {NULL, NULL, 0}
 };
 

@@ -56,14 +56,24 @@ crossprodvec <- function(x, vec, nIND, nSNP) {
 }
 
 #' @export
+center_scale<- function(x, nIND, nSNP) {
+  out <- .Call("pcaMatrix__center_scale", x@xptr, nIND, nSNP)
+  return(out)
+}
+
+#' @export
 # single core implementation
 ma_rsvd <- function(X, k, nIND, nSNP) {
-  it <- 0
+  
+  m <- center_scale(X, nIND, nSNP)
+  s <- sqrt(2 * m * (1 - m))
+  
   A <- function(x, args) {
-    prodvec(X, x, nIND, nSNP)
+    x <- x / s
+    return(prodvec(X, x, nIND, nSNP) - 2 * sum(x * m))
   }
   Atrans <- function(x, args) {
-    crossprodvec(X, x, nIND, nSNP)
+    return((crossprodvec(X, x, nIND, nSNP) - 2 * sum(x) * m) / s)
   }
   res <- RSpectra::svds(A, k, nu = k, nv = k, Atrans = Atrans, dim = c(nIND, nSNP))
   

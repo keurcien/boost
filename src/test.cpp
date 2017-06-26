@@ -1,4 +1,5 @@
 // [[Rcpp::depends(BH)]]
+// [[Rcpp::plugins(openmp)]]
 
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/exceptions.hpp>
@@ -19,6 +20,7 @@ public:
   Rcpp::IntegerMatrix extract_matrix(Rcpp::IntegerVector i, Rcpp::IntegerVector j);
   Rcpp::NumericVector prodvect(Rcpp::NumericVector x, int nIND, int nSNP);
   Rcpp::NumericVector crossprodvect(Rcpp::NumericVector x, int nIND, int nSNP);
+  Rcpp::NumericVector center_scale(int nIND, int nSNP);
 private:
   pcaMatrix(const pcaMatrix&);
   pcaMatrix& operator=(const pcaMatrix&);
@@ -44,11 +46,11 @@ int pcaMatrix::get_genotype(std::size_t i, std::size_t j) {
   char genotype = this->file_data[2 * which_pos];
   int mapping = NA_INTEGER; // missing
   if (genotype == 48) {
-    mapping = 0; // homozygous AA
+    mapping = 0;
   } else if (genotype == 49) {
-    mapping = 1; // homozygous BB
+    mapping = 1; 
   } else if (genotype == 50) {
-    mapping = 2; // heterozygous AB
+    mapping = 2;
   }
   return mapping;
 }
@@ -95,6 +97,34 @@ Rcpp::IntegerMatrix pcaMatrix::extract_matrix(Rcpp::IntegerVector i, Rcpp::Integ
   return out;
 }
 
+Rcpp::NumericVector pcaMatrix::center_scale(int nIND, int nSNP){
+  Rcpp::NumericVector ms(nSNP);
+  
+  for (int j = 0; j < nSNP; j++){
+    for (int i = 0; i < nIND; i++){
+      ms[j] += (double) (this-> get_genotype(i, j));
+    }
+    ms[j] /= (2 * nIND);
+  }
+  return(ms);
+}
+
+RcppExport SEXP pcaMatrix__center_scale(SEXP xp_, SEXP nIND_, SEXP nSNP_) {
+  // Convert inputs to appropriate C++ types
+  Rcpp::XPtr<pcaMatrix> ptr(xp_);
+  int nIND = Rcpp::as<int>(nIND_);
+  int nSNP = Rcpp::as<int>(nSNP_);
+  try {
+    // Invoke the extract_vector function
+    Rcpp::NumericVector ms = ptr->center_scale(nIND, nSNP);
+    return ms;
+  } catch(std::exception &ex) {
+    forward_exception_to_r(ex);
+    return 0;
+  }
+};
+
+
 Rcpp::NumericVector pcaMatrix::prodvect(Rcpp::NumericVector x, int nIND, int nSNP){
   Rcpp::NumericVector res(nIND);
   // Iterate over column indexes
@@ -117,15 +147,12 @@ Rcpp::NumericVector pcaMatrix::crossprodvect(Rcpp::NumericVector x, int nIND, in
   return(res);
 }
 
-// Export BEDMatrix::BEDMatrix
 RcppExport SEXP pcaMatrix__new(SEXP path_, SEXP n_, SEXP p_) {
   // Convert inputs to appropriate C++ types
   std::string path = Rcpp::as<std::string>(path_);
   int n = Rcpp::as<int>(n_);
   int p = Rcpp::as<int>(p_);
   try {
-    // Create a pointer to a BEDMatrix object and wrap it as an external
-    // pointer
     Rcpp::XPtr<pcaMatrix> ptr(new pcaMatrix(path, n, p), true);
     // Return the external pointer to the R side
     return ptr;
@@ -135,7 +162,6 @@ RcppExport SEXP pcaMatrix__new(SEXP path_, SEXP n_, SEXP p_) {
   }
 };
 
-// Export BEDMatrix::extract_vector
 RcppExport SEXP pcaMatrix__extract_vector(SEXP xp_, SEXP i_) {
   // Convert inputs to appropriate C++ types
   Rcpp::XPtr<pcaMatrix> ptr(xp_);
@@ -150,7 +176,6 @@ RcppExport SEXP pcaMatrix__extract_vector(SEXP xp_, SEXP i_) {
   }
 };
 
-// Export BEDMatrix::extract_matrix
 RcppExport SEXP pcaMatrix__extract_matrix(SEXP xp_, SEXP i_, SEXP j_) {
   // Convert inputs to appropriate C++ types
   Rcpp::XPtr<pcaMatrix> ptr(xp_);
@@ -166,7 +191,6 @@ RcppExport SEXP pcaMatrix__extract_matrix(SEXP xp_, SEXP i_, SEXP j_) {
   }
 };
 
-// Export BEDMatrix::extract_matrix
 RcppExport SEXP pcaMatrix__prodvect(SEXP xp_, SEXP x_, SEXP nIND_, SEXP nSNP_) {
   // Convert inputs to appropriate C++ types
   Rcpp::XPtr<pcaMatrix> ptr(xp_);
@@ -183,7 +207,6 @@ RcppExport SEXP pcaMatrix__prodvect(SEXP xp_, SEXP x_, SEXP nIND_, SEXP nSNP_) {
   }
 };
 
-// Export BEDMatrix::extract_matrix
 RcppExport SEXP pcaMatrix__crossprodvect(SEXP xp_, SEXP x_, SEXP nIND_, SEXP nSNP_) {
   // Convert inputs to appropriate C++ types
   Rcpp::XPtr<pcaMatrix> ptr(xp_);
